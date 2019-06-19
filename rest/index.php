@@ -1,22 +1,26 @@
 <?php
 require '../vendor/autoload.php';
 
-Flight::register('db', 'PDO', array('mysql:host=localhost:81;dbname=bills','root',''));
+Flight::register('db', 'PDO', array('mysql:host=localhost;dbname=bills','root',''));
 
 Flight::route('GET /bills', function(){
-    $bills = Flight::db()->query('SELECT * FROM bills', PDO::FETCH_ASSOC)->fetchAll();
+    $bills = Flight::db()->query('SELECT * FROM bill', PDO::FETCH_ASSOC)->fetchAll();
     Flight::json($bills);
+});
+
+Flight::route('GET /', function(){
+  echo "Hello World";
 });
 
 Flight::route('POST /bills', function(){
     $request = Flight::request()->data->getData();  
-      $insert = "INSERT INTO bills (type, datetime, total_amount, status) VALUES(:type, :datetime, :total_amount, :status)";
+      $insert = "INSERT INTO bill (type, datetime, total_amount, status) VALUES(:type, :datetime, :total_amount, :status)";
       $stmt= Flight::db()->prepare($insert);
       $stmt->execute($request);
       Flight::json(['message' => "Bill ".$request['type']." has been added successfully"]);
 });
 
-Flight::route('DELETE /bill/@id', function($id){
+Flight::route('DELETE /bills/@id', function($id){
   $query = "DELETE FROM bill WHERE id = :id";
   $stmt= Flight::db()->prepare($query);
   $stmt->execute(['id' => $id]);
